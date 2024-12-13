@@ -6,4 +6,4 @@ conditions:
   - when: 'data["http-path"] == "/healthz"'
     do: 'set_source_json("msg", "I changed the message") && set_data("msg", "I changed the message")'
   - when: 'data["http-status"] == "200"'
-    do: 'set_data("new_msg", source_json("msg") + " version 2")'
+    do: 'log("error", data["http-status"] + " - " + data["http-path"]) && set_data("new_msg", source_json("msg") + " version 2")'

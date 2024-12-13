@@ -1,6 +1,8 @@
 package panylexpr
 
-import "github.com/RangelReale/panyl"
+import (
+	"github.com/RangelReale/panyl"
+)
 
 type Expr struct {
 	Config *Config

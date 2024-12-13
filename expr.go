@@ -3,6 +3,7 @@ package panylexpr
 import (
 	"fmt"
 	"io"
+	"log/slog"
 	"os"
 
 	"github.com/RangelReale/panyl"
@@ -10,6 +11,7 @@ import (
 )
 
 type Config struct {
+	Logger     *slog.Logger
 	Conditions []Condition
 }
 
@@ -25,7 +27,7 @@ func NewConfig(options ...ConfigOption) (*Config, error) {
 
 func (e *Config) Process(p *panyl.Process) error {
 	for _, condition := range e.Conditions {
-		err := condition.Process(p)
+		err := condition.Process(e, p)
 		if err != nil {
 			return err
 		}
@@ -34,6 +36,13 @@ func (e *Config) Process(p *panyl.Process) error {
 }
 
 type ConfigOption func(*Config) error
+
+func WithConfigLogger(logger *slog.Logger) ConfigOption {
+	return func(e *Config) error {
+		e.Logger = logger
+		return nil
+	}
+}
 
 func WithConfigReader(r io.Reader) ConfigOption {
 	return func(e *Config) error {

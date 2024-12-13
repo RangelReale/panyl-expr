@@ -24,7 +24,7 @@ func TestCondition(t *testing.T) {
 		},
 	}
 
-	err = e.Process(pp)
+	err = e.Process(&Config{}, pp)
 	assert.NoError(t, err)
 	assert.Equal(t, panyl.MetadataLevel_WARNING, pp.Metadata[panyl.Metadata_Level])
 	assert.Equal(t, "1", pp.Data["a"])

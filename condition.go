@@ -36,7 +36,7 @@ func NewCondition(when, do string) (Condition, error) {
 	}, nil
 }
 
-func (e Condition) Process(p *panyl.Process) error {
+func (e Condition) Process(config *Config, p *panyl.Process) error {
 	condEnv := map[string]any{
 		"metadata": p.Metadata,
 		"data":     p.Data,
@@ -44,6 +44,9 @@ func (e Condition) Process(p *panyl.Process) error {
 		"source":   p.Source,
 		"source_json": func(name string) (any, error) {
 			return getJSONField(p.Source, name)
+		},
+		"log": func(level string, message string) (bool, error) {
+			return log(config.Logger, level, message)
 		},
 	}
 	maps.Copy(condEnv, defaultEnv)
@@ -139,6 +142,7 @@ var defaultWhenEnv = map[string]any{
 	"line":        "",
 	"source":      "",
 	"source_json": func(name string) (any, error) { return nil, nil },
+	"log":         func(level string, message string) (bool, error) { return true, nil },
 }
 
 var defaultDoEnv = map[string]any{
