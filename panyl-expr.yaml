@@ -1,3 +1,3 @@
 conditions:
-  - when: 'data.json.msg == "incoming request" && any(300..399, int(data.json["http-status"]))'
-    do: 'set_metadata("level", "warn") && set_data("a", "1")'
+  - when: 'metadata.message == "incoming request" && int(data["http-status"]) >= 300 && int(data["http-status"]) <= 399'
+    do: 'set_metadata(Metadata_Level, MetadataLevel_WARNING)'
