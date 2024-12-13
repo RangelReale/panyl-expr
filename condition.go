@@ -1,6 +1,7 @@
 package panylexpr
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"maps"
@@ -39,6 +40,11 @@ func (e Condition) Process(p *panyl.Process) error {
 	condEnv := map[string]any{
 		"metadata": p.Metadata,
 		"data":     p.Data,
+		"line":     p.Line,
+		"source":   p.Source,
+		"source_json": func(name string) (any, error) {
+			return getJSONField(p.Source, name)
+		},
 	}
 	maps.Copy(condEnv, defaultEnv)
 
@@ -59,8 +65,20 @@ func (e Condition) Process(p *panyl.Process) error {
 			p.Data[name] = value
 			return true
 		},
+		"set_source": func(source string) bool {
+			p.Source = source
+			return true
+		},
+		"set_source_json": func(name string, value any) (bool, error) {
+			src, err := setJSONField(p.Source, name, value)
+			if err != nil {
+				return false, err
+			}
+			p.Source = src
+			return true, nil
+		},
 	}
-	maps.Copy(resultEnv, defaultEnv)
+	maps.Copy(resultEnv, condEnv)
 	result, err := expr.Run(e.Do, resultEnv)
 	if err != nil {
 		return err
@@ -71,10 +89,40 @@ func (e Condition) Process(p *panyl.Process) error {
 	return nil
 }
 
+func getJSONField(source string, name string) (any, error) {
+	src := map[string]any{}
+	err := json.Unmarshal([]byte(source), &src)
+	if err != nil {
+		return "", fmt.Errorf("error unmarshalling source as JSON: %w", err)
+	}
+	if v, ok := src[name]; ok {
+		return v, nil
+	}
+	return nil, nil
+}
+
+func setJSONField(source string, name string, value any) (string, error) {
+	src := map[string]any{}
+	err := json.Unmarshal([]byte(source), &src)
+	if err != nil {
+		return "", fmt.Errorf("error unmarshalling source as JSON: %w", err)
+	}
+	src[name] = value
+	enc, err := json.Marshal(src)
+	if err != nil {
+		return "", fmt.Errorf("error marshalling source back to JSON: %w", err)
+	}
+	return string(enc), nil
+}
+
 var defaultEnv = map[string]any{
-	"Metadata_Timestamp": panyl.Metadata_Timestamp,
-	"Metadata_Message":   panyl.Metadata_Message,
-	"Metadata_Level":     panyl.Metadata_Level,
+	"Metadata_Timestamp":        panyl.Metadata_Timestamp,
+	"Metadata_Message":          panyl.Metadata_Message,
+	"Metadata_Level":            panyl.Metadata_Level,
+	"Metadata_Application":      panyl.Metadata_Application,
+	"Metadata_Category":         panyl.Metadata_Category,
+	"Metadata_OriginalCategory": panyl.Metadata_OriginalCategory,
+	"Metadata_Skip":             panyl.Metadata_Skip,
 
 	"MetadataLevel_TRACE":    panyl.MetadataLevel_TRACE,
 	"MetadataLevel_DEBUG":    panyl.MetadataLevel_DEBUG,
@@ -86,16 +134,22 @@ var defaultEnv = map[string]any{
 }
 
 var defaultWhenEnv = map[string]any{
-	"metadata": map[string]any{},
-	"data":     map[string]any{},
+	"metadata":    map[string]any{},
+	"data":        map[string]any{},
+	"line":        "",
+	"source":      "",
+	"source_json": func(name string) (any, error) { return nil, nil },
 }
 
 var defaultDoEnv = map[string]any{
-	"set_data":     func(name, value string) bool { return true },
-	"set_metadata": func(name, value string) bool { return true },
+	"set_data":        func(name, value string) bool { return true },
+	"set_metadata":    func(name, value string) bool { return true },
+	"set_source":      func(name, value string) bool { return true },
+	"set_source_json": func(name, value string) (bool, error) { return true, nil },
 }
 
 func init() {
-	maps.Copy(defaultWhenEnv, defaultEnv)
+	maps.Copy(defaultDoEnv, defaultWhenEnv)
 	maps.Copy(defaultDoEnv, defaultEnv)
+	maps.Copy(defaultWhenEnv, defaultEnv)
 }

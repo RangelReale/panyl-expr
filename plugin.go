@@ -8,6 +8,14 @@ type Expr struct {
 
 var _ panyl.PluginPostProcess = (*Expr)(nil)
 
+func New(options ...ConfigOption) (*Expr, error) {
+	cfg, err := NewConfig(options...)
+	if err != nil {
+		return nil, err
+	}
+	return &Expr{Config: cfg}, nil
+}
+
 func (e Expr) PostProcessOrder() int {
 	return 10
 }
