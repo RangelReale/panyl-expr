@@ -76,7 +76,7 @@ func loadConditionConfig(r io.Reader) ([]Condition, error) {
 	for _, c := range cc.Conditions {
 		cond, err := NewCondition(c.When, c.Do)
 		if err != nil {
-			return nil, fmt.Errorf("error loading expression: %v", err)
+			return nil, err
 		}
 		ret = append(ret, cond)
 	}

@@ -2,6 +2,7 @@ package panylexpr
 
 import (
 	"errors"
+	"fmt"
 	"maps"
 
 	"github.com/RangelReale/panyl"
@@ -20,13 +21,13 @@ func NewCondition(when, do string) (Condition, error) {
 		expr.Env(defaultWhenEnv),
 	)
 	if err != nil {
-		return Condition{}, err
+		return Condition{}, fmt.Errorf("error parsing '%s': %w", when, err)
 	}
 	programDo, err := expr.Compile(do,
 		expr.Env(defaultDoEnv),
 		expr.AsBool())
 	if err != nil {
-		return Condition{}, err
+		return Condition{}, fmt.Errorf("error parsing '%s': %w", do, err)
 	}
 	return Condition{
 		When: programWhen,
