@@ -10,7 +10,7 @@ import (
 
 func TestCondition(t *testing.T) {
 	e, err := NewCondition(`metadata.message == "incoming request" && int(data["http-status"]) >= 300 && int(data["http-status"]) <= 399`,
-		`set_metadata(Metadata_Level, MetadataLevel_WARNING) && set_data("a", "1")`)
+		`set_metadata(MetadataLevel, MetadataLevelWARNING) && set_data("a", "1")`)
 	assert.NoError(t, err)
 	pp := &panyl.Process{
 		Metadata: map[string]any{

@@ -1,6 +1,8 @@
 package panylexpr
 
 import (
+	"context"
+
 	"github.com/RangelReale/panyl"
 )
 
@@ -22,7 +24,7 @@ func (e Expr) PostProcessOrder() int {
 	return 10
 }
 
-func (e Expr) PostProcess(result *panyl.Process) (bool, error) {
+func (e Expr) PostProcess(ctx context.Context, result *panyl.Process) (bool, error) {
 	if e.Config == nil {
 		return false, nil
 	}

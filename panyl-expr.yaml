@@ -1,8 +1,8 @@
 conditions:
   - when: 'metadata.message == "incoming request" && int(data["http-status"]) >= 300 && int(data["http-status"]) <= 399'
-    do: 'set_metadata(Metadata_Level, MetadataLevel_WARNING)'
+    do: 'set_metadata(MetadataLevel, MetadataLevelWARNING)'
   - when: 'data["http-path"] == "/readyz"'
-    do: 'set_metadata(Metadata_Level, MetadataLevel_WARNING)'
+    do: 'set_metadata(MetadataLevel, MetadataLevelWARNING)'
   - when: 'data["http-path"] == "/healthz"'
     do: 'set_source_json("msg", "I changed the message") && set_data("msg", "I changed the message")'
   - when: 'data["http-status"] == "200"'
