@@ -119,19 +119,19 @@ func setJSONField(source string, name string, value any) (string, error) {
 }
 
 var defaultEnv = map[string]any{
-	"Metadata_Timestamp":        panyl.Metadata_Timestamp,
-	"Metadata_Message":          panyl.Metadata_Message,
-	"Metadata_Level":            panyl.Metadata_Level,
-	"Metadata_Application":      panyl.Metadata_Application,
-	"Metadata_Category":         panyl.Metadata_Category,
-	"Metadata_OriginalCategory": panyl.Metadata_OriginalCategory,
-	"Metadata_Skip":             panyl.Metadata_Skip,
+	"Metadata_Timestamp":        panyl.MetadataTimestamp,
+	"Metadata_Message":          panyl.MetadataMessage,
+	"Metadata_Level":            panyl.MetadataLevel,
+	"Metadata_Application":      panyl.MetadataApplication,
+	"Metadata_Category":         panyl.MetadataCategory,
+	"Metadata_OriginalCategory": panyl.MetadataOriginalCategory,
+	"Metadata_Skip":             panyl.MetadataSkip,
 
-	"MetadataLevel_TRACE":    panyl.MetadataLevel_TRACE,
-	"MetadataLevel_DEBUG":    panyl.MetadataLevel_DEBUG,
-	"MetadataLevel_INFO":     panyl.MetadataLevel_INFO,
-	"MetadataLevel_WARNING":  panyl.MetadataLevel_WARNING,
-	"MetadataLevel_ERROR":    panyl.MetadataLevel_ERROR,
+	"MetadataLevel_TRACE":    panyl.MetadataLevelTRACE,
+	"MetadataLevel_DEBUG":    panyl.MetadataLevelDEBUG,
+	"MetadataLevel_INFO":     panyl.MetadataLevelINFO,
+	"MetadataLevel_WARNING":  panyl.MetadataLevelWARNING,
+	"MetadataLevel_ERROR":    panyl.MetadataLevelERROR,
 	"MetadataLevel_CRITICAL": panyl.MetadataLevel_CRITICAL,
 	"MetadataLevel_FATAL":    panyl.MetadataLevel_FATAL,
 }

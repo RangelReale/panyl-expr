@@ -14,9 +14,9 @@ func TestCondition(t *testing.T) {
 	assert.NoError(t, err)
 	pp := &panyl.Process{
 		Metadata: map[string]any{
-			panyl.Metadata_Timestamp: time.Now(),
-			panyl.Metadata_Message:   "incoming request",
-			panyl.Metadata_Level:     panyl.MetadataLevel_INFO,
+			panyl.MetadataTimestamp: time.Now(),
+			panyl.MetadataMessage:   "incoming request",
+			panyl.MetadataLevel:     panyl.MetadataLevelINFO,
 		},
 		Data: map[string]any{
 			"http-status": "302",
@@ -26,6 +26,6 @@ func TestCondition(t *testing.T) {
 
 	err = e.Process(&Config{}, pp)
 	assert.NoError(t, err)
-	assert.Equal(t, panyl.MetadataLevel_WARNING, pp.Metadata[panyl.Metadata_Level])
+	assert.Equal(t, panyl.MetadataLevelWARNING, pp.Metadata[panyl.MetadataLevel])
 	assert.Equal(t, "1", pp.Data["a"])
 }
