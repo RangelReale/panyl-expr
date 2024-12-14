@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/RangelReale/panyl"
+	"github.com/RangelReale/panyl/v2"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -1,5 +1,5 @@
-github.com/RangelReale/panyl v0.9.3 h1:zewNjapX2UcuCDKFVjLdXGjSCaI8RNw3xT3gB/5l4mU=
-github.com/RangelReale/panyl v0.9.3/go.mod h1:68Juj4k/1L266evqgGCKKKdLRtExiKtpbJA70AaIFsQ=
+github.com/RangelReale/panyl/v2 v2.0.0 h1:VqJgov/ieLHIleuw2J3KB+DK6Sgwk9U/gQznvnQwm1s=
+github.com/RangelReale/panyl/v2 v2.0.0/go.mod h1:dt0CxBmZ512D7tj7yH18VcJ5NzztzQxdG1vbo+rImwU=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/expr-lang/expr v1.16.9 h1:WUAzmR0JNI9JCiF0/ewwHB1gmcGw5wW7nWt8gc6PpCI=

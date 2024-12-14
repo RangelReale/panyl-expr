@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/RangelReale/panyl"
+	"github.com/RangelReale/panyl/v2"
 	"gopkg.in/yaml.v3"
 )
 

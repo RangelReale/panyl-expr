@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"maps"
 
-	"github.com/RangelReale/panyl"
+	"github.com/RangelReale/panyl/v2"
 	"github.com/expr-lang/expr"
 	"github.com/expr-lang/expr/vm"
 )
