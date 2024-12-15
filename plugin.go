@@ -24,11 +24,11 @@ func (e Expr) PostProcessOrder() int {
 	return 10
 }
 
-func (e Expr) PostProcess(ctx context.Context, result *panyl.Item) (bool, error) {
+func (e Expr) PostProcess(ctx context.Context, item *panyl.Item) (bool, error) {
 	if e.Config == nil {
 		return false, nil
 	}
-	return false, e.Config.Process(result)
+	return false, e.Config.Process(item)
 }
 
 func (e Expr) IsPanylPlugin() {}
