@@ -10,7 +10,7 @@ type Expr struct {
 	Config *Config
 }
 
-var _ panyl.PluginPostProcess = (*Expr)(nil)
+var _ panyl.PluginPostProcess = Expr{}
 
 func New(options ...ConfigOption) (*Expr, error) {
 	cfg, err := NewConfig(options...)
