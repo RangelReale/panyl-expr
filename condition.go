@@ -36,7 +36,7 @@ func NewCondition(when, do string) (Condition, error) {
 	}, nil
 }
 
-func (e Condition) Process(config *Config, p *panyl.Process) error {
+func (e Condition) Process(config *Config, p *panyl.Item) error {
 	condEnv := map[string]any{
 		"metadata": p.Metadata,
 		"data":     p.Data,
