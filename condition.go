@@ -36,14 +36,14 @@ func NewCondition(when, do string) (Condition, error) {
 	}, nil
 }
 
-func (e Condition) Process(config *Config, p *panyl.Item) error {
+func (e Condition) Process(config *Config, item *panyl.Item) error {
 	condEnv := map[string]any{
-		"metadata": p.Metadata,
-		"data":     p.Data,
-		"line":     p.Line,
-		"source":   p.Source,
+		"metadata": item.Metadata,
+		"data":     item.Data,
+		"line":     item.Line,
+		"source":   item.Source,
 		"source_json": func(name string) (any, error) {
-			return getJSONField(p.Source, name)
+			return getJSONField(item.Source, name)
 		},
 		"log": func(level string, message string) (bool, error) {
 			return log(config.Logger, level, message)
@@ -61,23 +61,23 @@ func (e Condition) Process(config *Config, p *panyl.Item) error {
 
 	resultEnv := map[string]any{
 		"set_metadata": func(name, value string) bool {
-			p.Metadata[name] = value
+			item.Metadata[name] = value
 			return true
 		},
 		"set_data": func(name, value string) bool {
-			p.Data[name] = value
+			item.Data[name] = value
 			return true
 		},
 		"set_source": func(source string) bool {
-			p.Source = source
+			item.Source = source
 			return true
 		},
 		"set_source_json": func(name string, value any) (bool, error) {
-			src, err := setJSONField(p.Source, name, value)
+			src, err := setJSONField(item.Source, name, value)
 			if err != nil {
 				return false, err
 			}
-			p.Source = src
+			item.Source = src
 			return true, nil
 		},
 	}

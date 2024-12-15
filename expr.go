@@ -25,9 +25,9 @@ func NewConfig(options ...ConfigOption) (*Config, error) {
 	return ret, nil
 }
 
-func (e *Config) Process(p *panyl.Item) error {
+func (e *Config) Process(item *panyl.Item) error {
 	for _, condition := range e.Conditions {
-		err := condition.Process(e, p)
+		err := condition.Process(e, item)
 		if err != nil {
 			return err
 		}
