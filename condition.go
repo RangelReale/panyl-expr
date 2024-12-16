@@ -66,12 +66,20 @@ func (e Condition) Process(config *Config, item *panyl.Item) error {
 	}
 
 	resultEnv := map[string]any{
+		"set_data": func(name, value string) bool {
+			item.Data[name] = value
+			return true
+		},
+		"add_data_list": func(name, value string) bool {
+			item.Data.ListValueAdd(name, value)
+			return true
+		},
 		"set_metadata": func(name, value string) bool {
 			item.Metadata[name] = value
 			return true
 		},
-		"set_data": func(name, value string) bool {
-			item.Data[name] = value
+		"add_metadata_list": func(name, value string) bool {
+			item.Metadata.ListValueAdd(name, value)
 			return true
 		},
 		"set_source": func(source string) bool {
@@ -150,10 +158,12 @@ var defaultWhenEnv = map[string]any{
 }
 
 var defaultDoEnv = map[string]any{
-	"set_data":        func(name, value string) bool { return true },
-	"set_metadata":    func(name, value string) bool { return true },
-	"set_source":      func(name, value string) bool { return true },
-	"set_source_json": func(name, value string) (bool, error) { return true, nil },
+	"set_data":          func(name, value string) bool { return true },
+	"add_data_list":     func(name, value string) bool { return true },
+	"set_metadata":      func(name, value string) bool { return true },
+	"add_metadata_list": func(name, value string) bool { return true },
+	"set_source":        func(name, value string) bool { return true },
+	"set_source_json":   func(name, value string) (bool, error) { return true, nil },
 }
 
 func init() {
