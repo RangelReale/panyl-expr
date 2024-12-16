@@ -16,7 +16,7 @@ type Plugin struct {
 
 var _ panyl.PluginPostProcess = (*Plugin)(nil)
 
-func New(options ...ConfigOption) (*Plugin, error) {
+func New(options ...Option) (*Plugin, error) {
 	ret := &Plugin{}
 	for _, opt := range options {
 		if err := opt(ret); err != nil {
@@ -27,7 +27,7 @@ func New(options ...ConfigOption) (*Plugin, error) {
 }
 
 func (p *Plugin) PostProcessOrder() int {
-	return 10
+	return panyl.PostProcessOrderLast - 1
 }
 
 func (p *Plugin) PostProcess(ctx context.Context, item *panyl.Item) (bool, error) {

@@ -10,16 +10,18 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type ConfigOption func(*Plugin) error
+type Option func(*Plugin) error
 
-func WithConfigLogger(logger *slog.Logger) ConfigOption {
+// WithLogger sets a logger for debugging purposes.
+func WithLogger(logger *slog.Logger) Option {
 	return func(e *Plugin) error {
 		e.Logger = logger
 		return nil
 	}
 }
 
-func WithConfigReader(r io.Reader) ConfigOption {
+// WithConfigReader sets an io.Reader to read the configuration file.
+func WithConfigReader(r io.Reader) Option {
 	return func(e *Plugin) error {
 		cc, err := loadConditionConfig(e, r)
 		if err != nil {
@@ -30,7 +32,8 @@ func WithConfigReader(r io.Reader) ConfigOption {
 	}
 }
 
-func WithConfigFile(filename string) ConfigOption {
+// WithConfigFile sets a filename to read the configuration file.
+func WithConfigFile(filename string) Option {
 	return func(e *Plugin) error {
 		f, err := os.Open(filename)
 		if err != nil {
@@ -46,7 +49,8 @@ func WithConfigFile(filename string) ConfigOption {
 	}
 }
 
-func WithConfigConstants(constants map[string]any) ConfigOption {
+// WithConstants adds extra constants to the scripts.
+func WithConstants(constants map[string]any) Option {
 	return func(e *Plugin) error {
 		if e.Constants == nil {
 			e.Constants = map[string]any{}
@@ -56,6 +60,7 @@ func WithConfigConstants(constants map[string]any) ConfigOption {
 	}
 }
 
+// loadConditionConfig loads conditions from the configuration file.
 func loadConditionConfig(cfg *Plugin, r io.Reader) ([]Condition, error) {
 	var cc ConditionConfig
 
