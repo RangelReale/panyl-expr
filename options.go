@@ -1,58 +1,26 @@
 package panylexpr
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"log/slog"
 	"maps"
 	"os"
 
-	"github.com/RangelReale/panyl/v2"
 	"gopkg.in/yaml.v3"
 )
 
-type Config struct {
-	Logger     *slog.Logger
-	Conditions []Condition
-	Constants  map[string]any
-}
-
-func NewConfig(options ...ConfigOption) (*Config, error) {
-	ret := &Config{}
-	for _, opt := range options {
-		if err := opt(ret); err != nil {
-			return nil, err
-		}
-	}
-	return ret, nil
-}
-
-func (e *Config) AddConstants(c map[string]any) {
-	maps.Copy(e.Constants, c)
-}
-
-func (e *Config) Process(ctx context.Context, item *panyl.Item) error {
-	for _, condition := range e.Conditions {
-		err := condition.Process(ctx, e, item)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-type ConfigOption func(*Config) error
+type ConfigOption func(*Plugin) error
 
 func WithConfigLogger(logger *slog.Logger) ConfigOption {
-	return func(e *Config) error {
+	return func(e *Plugin) error {
 		e.Logger = logger
 		return nil
 	}
 }
 
 func WithConfigReader(r io.Reader) ConfigOption {
-	return func(e *Config) error {
+	return func(e *Plugin) error {
 		cc, err := loadConditionConfig(e, r)
 		if err != nil {
 			return fmt.Errorf("error decoding config: %v", err)
@@ -63,7 +31,7 @@ func WithConfigReader(r io.Reader) ConfigOption {
 }
 
 func WithConfigFile(filename string) ConfigOption {
-	return func(e *Config) error {
+	return func(e *Plugin) error {
 		f, err := os.Open(filename)
 		if err != nil {
 			return err
@@ -79,7 +47,7 @@ func WithConfigFile(filename string) ConfigOption {
 }
 
 func WithConfigConstants(constants map[string]any) ConfigOption {
-	return func(e *Config) error {
+	return func(e *Plugin) error {
 		if e.Constants == nil {
 			e.Constants = map[string]any{}
 		}
@@ -88,7 +56,7 @@ func WithConfigConstants(constants map[string]any) ConfigOption {
 	}
 }
 
-func loadConditionConfig(cfg *Config, r io.Reader) ([]Condition, error) {
+func loadConditionConfig(cfg *Plugin, r io.Reader) ([]Condition, error) {
 	var cc ConditionConfig
 
 	dec := yaml.NewDecoder(r)

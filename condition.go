@@ -17,11 +17,11 @@ type Condition struct {
 	Do   *vm.Program
 }
 
-func NewCondition(config *Config, when, do string) (Condition, error) {
+func NewCondition(plugin *Plugin, when, do string) (Condition, error) {
 	whenEnv := maps.Clone(defaultWhenEnv)
-	maps.Copy(whenEnv, config.Constants)
+	maps.Copy(whenEnv, plugin.Constants)
 	doEnv := maps.Clone(defaultDoEnv)
-	maps.Copy(doEnv, config.Constants)
+	maps.Copy(doEnv, plugin.Constants)
 
 	programWhen, err := expr.Compile(when,
 		expr.AsBool(),
@@ -44,7 +44,7 @@ func NewCondition(config *Config, when, do string) (Condition, error) {
 	}, nil
 }
 
-func (e Condition) Process(ctx context.Context, config *Config, item *panyl.Item) error {
+func (e Condition) Process(ctx context.Context, plugin *Plugin, item *panyl.Item) error {
 	condEnv := map[string]any{
 		"ctx":      ctx,
 		"metadata": item.Metadata,
@@ -55,11 +55,11 @@ func (e Condition) Process(ctx context.Context, config *Config, item *panyl.Item
 			return getJSONField(item.Source, name)
 		},
 		"log": func(level string, message string) (bool, error) {
-			return log(config.Logger, level, message)
+			return log(plugin.Logger, level, message)
 		},
 	}
 	maps.Copy(condEnv, defaultEnv)
-	maps.Copy(condEnv, config.Constants)
+	maps.Copy(condEnv, plugin.Constants)
 
 	output, err := expr.Run(e.When, condEnv)
 	if err != nil {
