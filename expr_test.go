@@ -29,3 +29,24 @@ func TestCondition(t *testing.T) {
 	assert.Equal(t, panyl.MetadataLevelWARNING, pp.Metadata[panyl.MetadataLevel])
 	assert.Equal(t, "1", pp.Data["a"])
 }
+
+func TestCondition2(t *testing.T) {
+	e, err := NewCondition(`"http-status" in data && int(data["http-status"]) >= 300 && int(data["http-status"]) <= 399`,
+		`set_metadata(MetadataLevel, MetadataLevelWARNING)`)
+	assert.NoError(t, err)
+	pp := &panyl.Item{
+		Metadata: map[string]any{
+			panyl.MetadataTimestamp: time.Now(),
+			panyl.MetadataMessage:   "incoming request",
+			panyl.MetadataLevel:     panyl.MetadataLevelINFO,
+		},
+		Data: map[string]any{
+			// "http-status": "302",
+			"http-path": "/healthz",
+		},
+	}
+
+	err = e.Process(&Config{}, pp)
+	assert.NoError(t, err)
+	assert.Equal(t, panyl.MetadataLevelINFO, pp.Metadata[panyl.MetadataLevel])
+}

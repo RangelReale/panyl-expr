@@ -16,16 +16,21 @@ type Condition struct {
 	Do   *vm.Program
 }
 
-func NewCondition(when, do string) (Condition, error) {
+func NewCondition(config *Config, when, do string) (Condition, error) {
+	whenEnv := maps.Clone(defaultWhenEnv)
+	maps.Copy(whenEnv, config.Constants)
+	doEnv := maps.Clone(defaultDoEnv)
+	maps.Copy(doEnv, config.Constants)
+
 	programWhen, err := expr.Compile(when,
 		expr.AsBool(),
-		expr.Env(defaultWhenEnv),
+		expr.Env(whenEnv),
 	)
 	if err != nil {
 		return Condition{}, fmt.Errorf("error parsing '%s': %w", when, err)
 	}
 	programDo, err := expr.Compile(do,
-		expr.Env(defaultDoEnv),
+		expr.Env(doEnv),
 		expr.AsBool())
 	if err != nil {
 		return Condition{}, fmt.Errorf("error parsing '%s': %w", do, err)
@@ -50,6 +55,7 @@ func (e Condition) Process(config *Config, item *panyl.Item) error {
 		},
 	}
 	maps.Copy(condEnv, defaultEnv)
+	maps.Copy(condEnv, config.Constants)
 
 	output, err := expr.Run(e.When, condEnv)
 	if err != nil {

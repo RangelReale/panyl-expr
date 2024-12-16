@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"maps"
 	"os"
 
 	"github.com/RangelReale/panyl/v2"
@@ -13,6 +14,7 @@ import (
 type Config struct {
 	Logger     *slog.Logger
 	Conditions []Condition
+	Constants  map[string]any
 }
 
 func NewConfig(options ...ConfigOption) (*Config, error) {
@@ -23,6 +25,10 @@ func NewConfig(options ...ConfigOption) (*Config, error) {
 		}
 	}
 	return ret, nil
+}
+
+func (e *Config) AddConstants(c map[string]any) {
+	maps.Copy(e.Constants, c)
 }
 
 func (e *Config) Process(item *panyl.Item) error {
@@ -46,7 +52,7 @@ func WithConfigLogger(logger *slog.Logger) ConfigOption {
 
 func WithConfigReader(r io.Reader) ConfigOption {
 	return func(e *Config) error {
-		cc, err := loadConditionConfig(r)
+		cc, err := loadConditionConfig(e, r)
 		if err != nil {
 			return fmt.Errorf("error decoding config: %v", err)
 		}
@@ -62,7 +68,7 @@ func WithConfigFile(filename string) ConfigOption {
 			return err
 		}
 		defer f.Close()
-		cc, err := loadConditionConfig(f)
+		cc, err := loadConditionConfig(e, f)
 		if err != nil {
 			return fmt.Errorf("error decoding config: %v", err)
 		}
@@ -71,7 +77,17 @@ func WithConfigFile(filename string) ConfigOption {
 	}
 }
 
-func loadConditionConfig(r io.Reader) ([]Condition, error) {
+func WithConfigConstants(constants map[string]any) ConfigOption {
+	return func(e *Config) error {
+		if e.Constants == nil {
+			e.Constants = map[string]any{}
+		}
+		maps.Copy(e.Constants, constants)
+		return nil
+	}
+}
+
+func loadConditionConfig(cfg *Config, r io.Reader) ([]Condition, error) {
 	var cc ConditionConfig
 
 	dec := yaml.NewDecoder(r)
@@ -83,7 +99,7 @@ func loadConditionConfig(r io.Reader) ([]Condition, error) {
 
 	var ret []Condition
 	for _, c := range cc.Conditions {
-		cond, err := NewCondition(c.When, c.Do)
+		cond, err := NewCondition(cfg, c.When, c.Do)
 		if err != nil {
 			return nil, err
 		}
