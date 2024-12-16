@@ -13,8 +13,9 @@ import (
 )
 
 type Condition struct {
-	When *vm.Program
-	Do   *vm.Program
+	Plugin *Plugin
+	When   *vm.Program
+	Do     *vm.Program
 }
 
 func NewCondition(plugin *Plugin, when, do string) (Condition, error) {
@@ -39,12 +40,32 @@ func NewCondition(plugin *Plugin, when, do string) (Condition, error) {
 		return Condition{}, fmt.Errorf("error parsing '%s': %w", do, err)
 	}
 	return Condition{
-		When: programWhen,
-		Do:   programDo,
+		Plugin: plugin,
+		When:   programWhen,
+		Do:     programDo,
 	}, nil
 }
 
-func (e Condition) Process(ctx context.Context, plugin *Plugin, item *panyl.Item) error {
+func (e Condition) Process(ctx context.Context, item *panyl.Item) error {
+	output, err := expr.Run(e.When, e.getWhenEnv(ctx, item))
+	if err != nil {
+		return err
+	}
+	if !output.(bool) {
+		return nil
+	}
+
+	result, err := expr.Run(e.Do, e.getDoEnv(ctx, item))
+	if err != nil {
+		return err
+	}
+	if !result.(bool) {
+		return errors.New("do returned false")
+	}
+	return nil
+}
+
+func (e Condition) getWhenEnv(ctx context.Context, item *panyl.Item) map[string]any {
 	condEnv := map[string]any{
 		"ctx":      ctx,
 		"metadata": item.Metadata,
@@ -55,21 +76,17 @@ func (e Condition) Process(ctx context.Context, plugin *Plugin, item *panyl.Item
 			return getJSONField(item.Source, name)
 		},
 		"log": func(level string, message string) (bool, error) {
-			return log(plugin.Logger, level, message)
+			return log(e.Plugin.Logger, level, message)
 		},
 	}
 	maps.Copy(condEnv, defaultEnv)
-	maps.Copy(condEnv, plugin.Constants)
+	maps.Copy(condEnv, e.Plugin.Constants)
+	return condEnv
+}
 
-	output, err := expr.Run(e.When, condEnv)
-	if err != nil {
-		return err
-	}
-	if !output.(bool) {
-		return nil
-	}
-
-	resultEnv := map[string]any{
+func (e Condition) getDoEnv(ctx context.Context, item *panyl.Item) map[string]any {
+	resultEnv := e.getWhenEnv(ctx, item)
+	maps.Copy(resultEnv, map[string]any{
 		"set_data": func(name, value string) bool {
 			item.Data[name] = value
 			return true
@@ -98,16 +115,8 @@ func (e Condition) Process(ctx context.Context, plugin *Plugin, item *panyl.Item
 			item.Source = src
 			return true, nil
 		},
-	}
-	maps.Copy(resultEnv, condEnv)
-	result, err := expr.Run(e.Do, resultEnv)
-	if err != nil {
-		return err
-	}
-	if !result.(bool) {
-		return errors.New("do returned false")
-	}
-	return nil
+	})
+	return resultEnv
 }
 
 func getJSONField(source string, name string) (any, error) {
@@ -172,7 +181,6 @@ var defaultDoEnv = map[string]any{
 }
 
 func init() {
-	maps.Copy(defaultDoEnv, defaultWhenEnv)
-	maps.Copy(defaultDoEnv, defaultEnv)
 	maps.Copy(defaultWhenEnv, defaultEnv)
+	maps.Copy(defaultDoEnv, defaultWhenEnv)
 }
