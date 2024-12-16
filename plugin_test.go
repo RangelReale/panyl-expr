@@ -26,7 +26,7 @@ func TestCondition(t *testing.T) {
 		},
 	}
 
-	err = e.Process(ctx, &Plugin{}, pp)
+	err = e.Process(ctx, pp)
 	assert.NoError(t, err)
 	assert.Equal(t, panyl.MetadataLevelWARNING, pp.Metadata[panyl.MetadataLevel])
 	assert.Equal(t, "1", pp.Data["a"])
@@ -49,7 +49,7 @@ func TestCondition2(t *testing.T) {
 		},
 	}
 
-	err = e.Process(ctx, &Plugin{}, pp)
+	err = e.Process(ctx, pp)
 	assert.NoError(t, err)
 	assert.Equal(t, panyl.MetadataLevelINFO, pp.Metadata[panyl.MetadataLevel])
 }

@@ -32,7 +32,7 @@ func (p *Plugin) PostProcessOrder() int {
 
 func (p *Plugin) PostProcess(ctx context.Context, item *panyl.Item) (bool, error) {
 	for _, condition := range p.Conditions {
-		err := condition.Process(ctx, p, item)
+		err := condition.Process(ctx, item)
 		if err != nil {
 			return false, err
 		}
