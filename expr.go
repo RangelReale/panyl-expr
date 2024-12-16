@@ -1,6 +1,7 @@
 package panylexpr
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"log/slog"
@@ -31,9 +32,9 @@ func (e *Config) AddConstants(c map[string]any) {
 	maps.Copy(e.Constants, c)
 }
 
-func (e *Config) Process(item *panyl.Item) error {
+func (e *Config) Process(ctx context.Context, item *panyl.Item) error {
 	for _, condition := range e.Conditions {
-		err := condition.Process(e, item)
+		err := condition.Process(ctx, e, item)
 		if err != nil {
 			return err
 		}

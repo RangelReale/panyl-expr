@@ -1,6 +1,7 @@
 package panylexpr
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -25,13 +26,15 @@ func NewCondition(config *Config, when, do string) (Condition, error) {
 	programWhen, err := expr.Compile(when,
 		expr.AsBool(),
 		expr.Env(whenEnv),
+		expr.WithContext("ctx"),
 	)
 	if err != nil {
 		return Condition{}, fmt.Errorf("error parsing '%s': %w", when, err)
 	}
 	programDo, err := expr.Compile(do,
 		expr.Env(doEnv),
-		expr.AsBool())
+		expr.AsBool(),
+		expr.WithContext("ctx"))
 	if err != nil {
 		return Condition{}, fmt.Errorf("error parsing '%s': %w", do, err)
 	}
@@ -41,8 +44,9 @@ func NewCondition(config *Config, when, do string) (Condition, error) {
 	}, nil
 }
 
-func (e Condition) Process(config *Config, item *panyl.Item) error {
+func (e Condition) Process(ctx context.Context, config *Config, item *panyl.Item) error {
 	condEnv := map[string]any{
+		"ctx":      ctx,
 		"metadata": item.Metadata,
 		"data":     item.Data,
 		"line":     item.Line,
@@ -149,6 +153,7 @@ var defaultEnv = map[string]any{
 }
 
 var defaultWhenEnv = map[string]any{
+	"ctx":         context.Background(),
 	"metadata":    map[string]any{},
 	"data":        map[string]any{},
 	"line":        "",

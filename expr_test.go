@@ -1,6 +1,7 @@
 package panylexpr
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 )
 
 func TestCondition(t *testing.T) {
+	ctx := context.Background()
 	e, err := NewCondition(&Config{}, `metadata.message == "incoming request" && int(data["http-status"]) >= 300 && int(data["http-status"]) <= 399`,
 		`set_metadata(MetadataLevel, MetadataLevelWARNING) && set_data("a", "1")`)
 	assert.NoError(t, err)
@@ -24,13 +26,14 @@ func TestCondition(t *testing.T) {
 		},
 	}
 
-	err = e.Process(&Config{}, pp)
+	err = e.Process(ctx, &Config{}, pp)
 	assert.NoError(t, err)
 	assert.Equal(t, panyl.MetadataLevelWARNING, pp.Metadata[panyl.MetadataLevel])
 	assert.Equal(t, "1", pp.Data["a"])
 }
 
 func TestCondition2(t *testing.T) {
+	ctx := context.Background()
 	e, err := NewCondition(&Config{}, `"http-status" in data && int(data["http-status"]) >= 300 && int(data["http-status"]) <= 399`,
 		`set_metadata(MetadataLevel, MetadataLevelWARNING)`)
 	assert.NoError(t, err)
@@ -46,7 +49,7 @@ func TestCondition2(t *testing.T) {
 		},
 	}
 
-	err = e.Process(&Config{}, pp)
+	err = e.Process(ctx, &Config{}, pp)
 	assert.NoError(t, err)
 	assert.Equal(t, panyl.MetadataLevelINFO, pp.Metadata[panyl.MetadataLevel])
 }

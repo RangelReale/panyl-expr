@@ -28,7 +28,7 @@ func (e Expr) PostProcess(ctx context.Context, item *panyl.Item) (bool, error) {
 	if e.Config == nil {
 		return false, nil
 	}
-	return false, e.Config.Process(item)
+	return false, e.Config.Process(ctx, item)
 }
 
 func (e Expr) IsPanylPlugin() {}
