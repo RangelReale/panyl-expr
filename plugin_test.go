@@ -53,3 +53,25 @@ func TestCondition2(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, panyl.MetadataLevelINFO, pp.Metadata[panyl.MetadataLevel])
 }
+
+func TestCondition3(t *testing.T) {
+	ctx := context.Background()
+	e, err := NewCondition(&Plugin{}, `metadata.message == "incoming request" && int(data["http-status"]) >= 300 && int(data["http-status"]) <= 399`,
+		`set_metadata(MetadataMessage, sprintf("%s [%s]", metadata.message, data["http-status"]))`)
+	assert.NoError(t, err)
+	pp := &panyl.Item{
+		Metadata: map[string]any{
+			panyl.MetadataTimestamp: time.Now(),
+			panyl.MetadataMessage:   "incoming request",
+			panyl.MetadataLevel:     panyl.MetadataLevelINFO,
+		},
+		Data: map[string]any{
+			"http-status": "302",
+			"http-path":   "/healthz",
+		},
+	}
+
+	err = e.Process(ctx, pp)
+	assert.NoError(t, err)
+	assert.Equal(t, "incoming request [302]", pp.Metadata[panyl.MetadataMessage])
+}

@@ -115,6 +115,7 @@ func (e Condition) getDoEnv(ctx context.Context, item *panyl.Item) map[string]an
 			item.Source = src
 			return true, nil
 		},
+		"sprintf": fmt.Sprintf,
 	})
 	return resultEnv
 }
@@ -178,6 +179,7 @@ var defaultDoEnv = map[string]any{
 	"add_metadata_list": func(name, value string) bool { return true },
 	"set_source":        func(name, value string) bool { return true },
 	"set_source_json":   func(name, value string) (bool, error) { return true, nil },
+	"sprintf":           func(format string, a ...any) string { return "" },
 }
 
 func init() {
